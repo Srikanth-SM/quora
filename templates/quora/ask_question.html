@@ -1,0 +1,19 @@
+{% extends "quora/index.html" %}
+{% block center-content %}
+<h3></h3>
+<form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="card   bg-light mb-2 ">
+        <div class="card-body">
+            <h4 class="card-title  bg-light">
+                Enter a Question you want to know about:-
+            </h4>
+            <textarea name="question" id="" style="min-height: 40%!important; min-width: 100%!important" required=""></textarea>
+        </div>
+    </div>
+    {% endfor %}
+    <a href="{% url 'quora:home' %}" class="btn btn-danger" value="Cancel">Cancel</a>
+    <input type="submit" class="btn btn-primary" value="Ask Question">
+</form>
+{% endblock %}

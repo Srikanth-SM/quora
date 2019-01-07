@@ -1,0 +1,50 @@
+{% extends "quora/index.html" %}
+
+{% block center-content %}
+{% for question in questions %}
+{{forloop.counter1}}
+<div class="card   bg-light mb-2 ">
+    <!-- <img class="card-img-top" src="holder.js/100x180/" alt=""> -->
+    <div class="card-body">
+        <h4 class="card-title  bg-light ">
+            <a href="{% url 'quora:question_detail' question.id%}"> {{question}}
+                {% with question.get_question_upvoters.count as upvote_count %}
+                <sub>{{upvote_count}} upvote{{upvote_count|pluralize}}</sub>
+                {% endwith %}
+                <a class="card-subtitle" href="{% url 'quora:answer_question' question.id %}" style="float:right; font-size :15;">
+                    Answer
+                </a></a>
+        </h4>
+        {% if question.get_answers_to_question.count %}
+        {% for answer in question.get_answers_to_question %}
+        <div class="card-body">
+            <p class="card-title giveMeEllipsis">{{answer}}
+                <span><a href="{% url 'quora:comment_answer' question.id answer.id%}" style="float:right; font-size :15;">
+                        Comment
+                    </a></span>
+            </p>
+            {% with answer.get_answer_upvoters.count as upvote_count %}
+            <sub>{{upvote_count}} upvote{{upvote_count|pluralize}}</sub>
+            {% endwith %}
+            {% if answer.get_comments_for_answer.count %}
+            {% for comment in answer.get_comments_for_answer %}
+            <div class="card-body">
+                <!-- <p class="card-text">{{comment}}</p> -->
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="card-body">
+                <!-- <p class="card-text">No Comments for this answer..</p> -->
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="card-body">
+            <p class="card-text">No Answers for this question..</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

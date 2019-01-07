@@ -1,0 +1,27 @@
+{% extends "quora/index.html" %}
+{% block center-content %}
+<form method="post">
+    {% csrf_token %}
+    <div class="card   bg-light mb-2 ">
+        <div class="card-body">
+            <h5 class="card-title  bg-light">
+                <label for="question" name='question'>{{form.instance.question}}</label>
+                <input type="hidden" name="question" value='{{form.instance.question_id}}'>
+            </h5>
+            <div class="card-body">
+                <h6 class="card-title  bg-light">
+                    <label for="answer" name='answer'>{{form.instance.answer}}</label>
+                    <input type="hidden" name="answer" value='{{form.instance.id}}'>
+                </h6>
+                <div class="card-body">
+                    Add your comment below :-
+                    <textarea name="comment" id="" style="min-height: 10%; min-width: 100%" required=""></textarea>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <a href="{% url 'quora:home' %}" class="btn btn-danger" value="Cancel">Cancel</a>
+    <input type="submit" class="btn btn-primary" value="Post Comment">
+</form>
+{% endblock %}

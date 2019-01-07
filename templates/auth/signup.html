@@ -1,14 +1,11 @@
 {% extends "quora/base.html" %}
-
 {% block content %}
-
 <form method='POST'>
   {% csrf_token %}
   {% for f in form %}
-
   <p>{{f.name}}:{{f}} {{f.errors}}</p>
   {% endfor%}
   <input type="submit" value="SignUp">
   <a href="{%url 'authenticate:login' %}">Login</a>
 </form>
-{% endblock % }
+{% endblock %}

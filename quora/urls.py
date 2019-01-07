@@ -19,11 +19,23 @@ from django.conf.urls import include
 from authenticate import views as auth_views
 from quora import views
 
+app_name = 'quora'
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('authenticate.urls')),
-    path('admin/', admin.site.urls),
-    path('', auth_views.landing_page),
-    path('home', views.home, name='home'),
+    path('home/', views.home, name='home'),
+    path('home/question/<int:question_id>/',
+         views.question_detail, name='question_detail'),
+    path('home/ask_question/', views.ask_question, name='ask_question'),
+    path('home/question/<int:question_id>/answer_question/',
+         views.answer_question, name='answer_question'),
+    path('home/question/<int:question_id>/answer/<int:answer_id>/comment/',
+         views.comment_answer, name='comment_answer'),
+    path('home/question/<int:question_id>/upvote/',
+         views.vote_question, name='upvote_question'),
+    path('home/question/<int:question_id>/downvote/',
+         views.vote_question, name='downvote_question'),
+    path('home/question/<int:question_id>/upvote/<int:answer_id>/',
+         views.vote_answer, name='upvote_answer'),
+    path('home/question/<int:question_id>/downvote/<int:answer_id>/',
+         views.vote_answer, name='downvote_answer'),
 
 ]

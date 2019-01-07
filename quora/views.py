@@ -1,8 +1,16 @@
 import os
+import sys
+import logging
 from django.shortcuts import render, redirect
-from quora.models import Question, Answer, Comment
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
+from quora.models import Question, Answer, Comment, Question_Vote, Answer_Vote
+from quora.forms import QuestionForm, AnswerForm, CommentForm
 
 TEMPLATE_DIR = 'quora'
+
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
 def home(request):
@@ -12,3 +20,166 @@ def home(request):
         'questions': questions
     }
     return render(request, template, context)
+
+
+def question_detail(request, question_id):
+    template = os.path.join(TEMPLATE_DIR, 'question_detail.html')
+    logging.info("Inside question_detail view,{}".format(question_id))
+
+    try:
+        question_detail = Question.objects.get(id=question_id)
+        context = {
+            'question': question_detail
+        }
+        return render(request, template, context)
+    except Question.DoesNotExist as e:
+        messages.info(request, "The Question does not exist")
+        return redirect("quora:home")
+
+
+@login_required
+def ask_question(request):
+    template = os.path.join(TEMPLATE_DIR, 'ask_question.html')
+    logging.info("Inside ask_question")
+    question_form = None
+    if request.method == 'POST':
+        question_form = QuestionForm(request.POST)
+        logging.debug(request.POST)
+        if question_form.is_valid():
+            question = question_form.cleaned_data['question']
+            user = request.user
+            user_question = Question(question=question, user_id=user.id)
+            user_question.save()
+            return redirect("quora:home")
+        else:
+            messages.info(request, question_form.errors)
+            return redirect("quora:home")
+    else:
+        question_form = QuestionForm()
+        logging.debug(question_form)
+    context = {"form": question_form}
+    return render(request, template, context)
+
+
+@login_required
+def answer_question(request, question_id):
+    template = os.path.join(TEMPLATE_DIR, 'answer_question.html')
+    question_form = None
+    try:
+        question = Question.objects.get(id=question_id)
+        logging.debug(question)
+        if request.method == 'POST':
+            import pdb
+            pdb.set_trace()
+            answer_form = AnswerForm(request.POST)
+            logging.debug(answer_form)
+            if answer_form.is_valid():
+                answer = answer_form.cleaned_data['answer']
+                user = request.user
+                user_answer = Answer(
+                    answer=answer, question_id=question_id, user_id=user.id)
+                user_answer = user_answer.save()
+                logging.debug(user_answer)
+                return redirect("quora:home")
+            else:
+                messages.info(request, answer_form.errors)
+                return redirect("quora:home")
+        else:
+            question_form = QuestionForm(instance=question)
+            logging.debug(dir(question_form.instance))
+        context = {"form": question_form}
+        return render(request, template, context)
+    except Answer.DoesNotExist:
+        messages.info(request, "Question does not exist")
+        return redirect("quora:home")
+
+
+@login_required
+def comment_answer(request, question_id, answer_id):
+    template = os.path.join(TEMPLATE_DIR, 'comment_answer.html')
+    answer_form = None
+    try:
+        answer = Answer.objects.get(id=answer_id, question_id=question_id)
+        logging.debug(answer)
+        if request.method == 'POST':
+            comment_form = CommentForm(request.POST)
+            logging.debug("Inside comment_answer method POST")
+            if comment_form.is_valid():
+                comment = request.POST.get('comment')
+                user = request.user
+                user_comment = Comment(
+                    comment=comment, answer_id=answer_id, user_id=user.id)
+                user_comment.save()
+                return redirect('quora:home')
+            else:
+                messages.info(request, comment_form.errors)
+                return redirect("quora:home")
+        else:
+            answer_form = AnswerForm(instance=answer)
+        context = {'form': answer_form}
+        logging.debug(dir(answer_form.instance))
+        return render(request, template, context)
+    except Answer.DoesNotExist:
+        messages.info(request, "Answer does not exist")
+        return redirect("quora:home")
+
+
+@login_required
+def vote_question(request, question_id):
+    path = request.path
+    logging.info(path)
+    user = request.user
+    upvote = 'upvote' in path
+    question_vote = None
+    try:
+        question_vote = Question_Vote.objects.get(
+            user_id=user.id, question_id=question_id)
+        logging.debug(question_vote)
+    except Question_Vote.DoesNotExist:
+        question_vote = Question_Vote(
+            user_id=user.id, question_id=question_id)
+        logging.debug(question_vote)
+        logging.debug(question_vote)
+    finally:
+        if question_vote.question.user_id != user.id:
+            logging.debug(question_vote)
+            if upvote:
+                question_vote.votes = 1 if int(question_vote.votes) <= 0 else 0
+            else:
+                question_vote.votes = - \
+                    1 if int(question_vote.votes) >= 0 else 0
+            question_vote.save()
+            messages.success(request, "Question voted successfully")
+        else:
+            messages.error(request, "Question can't be upvoted by self")
+        return redirect('quora:home')
+
+
+@login_required
+def vote_answer(request, question_id, answer_id):
+    path = request.path
+    logging.info(path)
+    user = request.user
+    upvote = 'upvote' in path
+    answer_vote = None
+    try:
+        answer_vote = Answer_Vote.objects.get(
+            user_id=user.id, answer_id=answer_id)
+        logging.debug(answer_vote)
+    except Answer_Vote.DoesNotExist:
+        answer_vote = Answer_Vote(
+            user_id=user.id, answer_id=answer_id)
+        logging.debug(answer_vote)
+    finally:
+        if answer_vote.answer.user_id != user.id:
+            logging.debug(answer_vote)
+            if upvote:
+                answer_vote.votes = 1 if int(answer_vote.votes) <= 0 else 0
+            else:
+                answer_vote.votes = - \
+                    1 if int(answer_vote.votes) >= 0 else 0
+            answer_vote.save()
+            messages.success(request, "Answer voted successfully")
+        else:
+            messages.error(request, "Answer can't be upvoted by self")
+        return redirect('quora:home')

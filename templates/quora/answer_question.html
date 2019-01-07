@@ -1,0 +1,20 @@
+{% extends "quora/index.html" %}
+{% block center-content %}
+<form method="post">
+    {% csrf_token %}
+    {{form.id}}
+    {% for field in form %}
+    <div class="card   bg-light mb-2 ">
+        <div class="card-body">
+            <h4 class="card-title  bg-light">
+                <label for="question" name='question'>{{field.value}}</label>
+                <input type="hidden" name="question" value='{{form.instance.id}}'>
+            </h4>
+            <textarea name="answer" id="" style="min-height: 10%; min-width: 100%" required=""></textarea>
+        </div>
+    </div>
+    {% endfor %}
+    <a href="{% url 'quora:home' %}" class="btn btn-danger" value="Cancel">Cancel</a>
+    <input type="submit" class="btn btn-primary" value="Post Answer">
+</form>
+{% endblock %}

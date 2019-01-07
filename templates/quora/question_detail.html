@@ -1,0 +1,45 @@
+{% extends "quora/index.html" %}
+{% block center-content %}
+<div class="card   bg-light mb-2 ">
+    <div class="card-body">
+
+        <p class="card-title">
+            <b>{{question}}</b>
+            {{question.get_question_upvoters.count}}
+            <span style=" margin:10px"><a href="{% url 'quora:upvote_question' question.id %}">upvote</a></span>
+            <span style="margin:10px"><a href="{% url 'quora:downvote_question' question.id %}" style="color:red">downvote</a></span>
+            <a class="card-subtitle" href="{% url 'quora:answer_question' question.id %}" style="float:right; font-size :15;">
+                Answer
+            </a></a>
+        </p>
+
+        {% if question.get_answers_to_question.count %}
+        {% for answer in question.get_answers_to_question %}
+        <div class="card-body">
+            <p class="card-title">
+                {{answer}}
+                <sub> {{answer.get_answer_upvoters.count}} <span style=" margin:10px"><a href="{% url 'quora:upvote_answer' question.id answer.id %}">upvote</a></span></sub>
+                <sub><span style="margin:10px"><a href="{% url 'quora:downvote_answer' question.id answer.id %}" style="color:red">downvote</a></span></sub>
+                <span><a href="answer/{{answer.id}}/comment/" style="float:right; font-size :15;">
+                        Comment
+                    </a></span>
+            </p>
+            {% if answer.get_comments_for_answer.count %}
+            {% for comment in answer.get_comments_for_answer %}
+            <div class="card-body">
+                <p class="card-text">{{comment}}</p>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="card-body">
+                <p class="card-text">No Comments for this answer..</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <h2>No answers for this question yet.</h2>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
