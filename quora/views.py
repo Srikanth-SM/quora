@@ -22,6 +22,7 @@ def home(request):
     return render(request, template, context)
 
 
+@login_required
 def question_detail(request, question_id):
     template = os.path.join(TEMPLATE_DIR, 'question_detail.html')
     logging.info("Inside question_detail view,{}".format(question_id))
