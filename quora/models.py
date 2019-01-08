@@ -56,6 +56,13 @@ class QuestionVote(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, null=False)
     votes = models.IntegerField(default=0)
 
+    def upvote(self):
+        self.votes = 1 if int(self.votes) <= 0 else 0
+
+    def downvote(self):
+        self.votes = - \
+            1 if int(self.votes) >= 0 else 0
+
     def __str__(self):
         return "{}, {}, {}".format(self.question, self.user, self.votes)
 
@@ -64,6 +71,13 @@ class AnswerVote(models.Model):
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE, null=False)
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, null=False)
     votes = models.IntegerField(default=0)
+
+    def upvote(self):
+        self.votes = 1 if int(self.votes) <= 0 else 0
+
+    def downvote(self):
+        self.votes = - \
+            1 if int(self.votes) >= 0 else 0
 
 
 class Comment(models.Model):
