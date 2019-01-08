@@ -50,7 +50,7 @@ class Answer(models.Model):
         return self.comment_set.all()
 
 
-class Question_Vote(models.Model):
+class QuestionVote(models.Model):
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, null=False)
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, null=False)
@@ -60,7 +60,7 @@ class Question_Vote(models.Model):
         return "{}, {}, {}".format(self.question, self.user, self.votes)
 
 
-class Answer_Vote(models.Model):
+class AnswerVote(models.Model):
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE, null=False)
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, null=False)
     votes = models.IntegerField(default=0)

@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from quora.models import Question, Answer, Comment, Question_Vote, Answer_Vote
+from quora.models import Question, Answer, Comment, QuestionVote, AnswerVote
 from quora.forms import QuestionForm, AnswerForm, CommentForm
 
 TEMPLATE_DIR = 'quora'
@@ -133,11 +133,11 @@ def vote_question(request, question_id):
     upvote = 'upvote' in path
     question_vote = None
     try:
-        question_vote = Question_Vote.objects.get(
+        question_vote = QuestionVote.objects.get(
             user_id=user.id, question_id=question_id)
         logging.debug(question_vote)
-    except Question_Vote.DoesNotExist:
-        question_vote = Question_Vote(
+    except QuestionVote.DoesNotExist:
+        question_vote = QuestionVote(
             user_id=user.id, question_id=question_id)
         logging.debug(question_vote)
         logging.debug(question_vote)
@@ -164,11 +164,11 @@ def vote_answer(request, question_id, answer_id):
     upvote = 'upvote' in path
     answer_vote = None
     try:
-        answer_vote = Answer_Vote.objects.get(
+        answer_vote = AnswerVote.objects.get(
             user_id=user.id, answer_id=answer_id)
         logging.debug(answer_vote)
-    except Answer_Vote.DoesNotExist:
-        answer_vote = Answer_Vote(
+    except AnswerVote.DoesNotExist:
+        answer_vote = AnswerVote(
             user_id=user.id, answer_id=answer_id)
         logging.debug(answer_vote)
     finally:

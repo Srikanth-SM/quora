@@ -1,8 +1,8 @@
 from django.contrib import admin
-from quora.models import Question, Answer, Question_Vote, Answer_Vote, Comment
+from quora.models import Question, Answer, QuestionVote, AnswerVote, Comment
 
 admin.site.register(Question)
 admin.site.register(Answer)
-admin.site.register(Question_Vote)
-admin.site.register(Answer_Vote)
+admin.site.register(QuestionVote)
+admin.site.register(AnswerVote)
 admin.site.register(Comment)
