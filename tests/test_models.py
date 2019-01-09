@@ -6,6 +6,7 @@ from datetime import datetime
 from django.db import IntegrityError, DataError
 from django.contrib.auth.models import User
 from authenticate.models import MyUser
+
 from quora.models import *
 
 
@@ -143,3 +144,55 @@ class Test_Answer:
         with pytest.raises(IntegrityError):
             Answer.objects.create(
                 answer='some answer', user=testuser, question_id=questioncount+1)
+
+
+class TestQuestionVote:
+
+    def test_if_questionvote_instance_is_created(self, question, testuser):
+        q = QuestionVote.objects.get_or_create(
+            question=question, user=testuser)
+        assert q != None
+
+    def test_if_Question_is_upvoted_successfully(self, question, testuser):
+        q = QuestionVote.objects.get_or_create(
+            question=question, user=testuser)[0]
+        assert q.votes == 0
+        q.upvote()
+        assert q.votes == 1
+        q.upvote()
+        assert q.votes == 0
+
+    def test_if_Question_is_downvoted_successfully(self, question, testuser):
+        q = QuestionVote.objects.get_or_create(
+            question=question, user=testuser)[0]
+        assert q.votes == 0
+        q.downvote()
+        assert q.votes == -1
+        q.downvote()
+        assert q.votes == 0
+
+
+class TestanswerVote:
+
+    def test_if_answervote_instance_is_created(self, answer, testuser):
+        a = AnswerVote.objects.get_or_create(
+            answer=answer, user=testuser)
+        assert a != None
+
+    def test_if_answer_is_upvoted_successfully(self, answer, testuser):
+        a = AnswerVote.objects.get_or_create(
+            answer=answer, user=testuser)[0]
+        assert a.votes == 0
+        a.upvote()
+        assert a.votes == 1
+        a.upvote()
+        assert a.votes == 0
+
+    def test_if_answer_is_downvoted_successfully(self, answer, testuser):
+        a = AnswerVote.objects.get_or_create(
+            answer=answer, user=testuser)[0]
+        assert a.votes == 0
+        a.downvote()
+        assert a.votes == -1
+        a.downvote()
+        assert a.votes == 0
